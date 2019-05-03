@@ -127,9 +127,7 @@ if(USE_PCL)
   # An other way could be to include PCLConfig.cmake, but in that case, visp-config and visp.pc
   # will be not able to give the names of PCL libraries when used without CMake.
   foreach(lib_ ${PCL_LIBRARIES})
-    # check if ${lib_} is in VTK_LIBRARIES and is a TARGET. If this is the case, we retrieve the full location
-    list(FIND VTK_LIBRARIES ${lib_} lib_is_vtk_)
-    if(NOT ${lib_is_vtk_} EQUAL -1 AND TARGET ${lib_})
+    if(TARGET ${lib_})
       # This is a VTK library
       list(APPEND PCL_VTK_LIBRARIES ${lib_})
     else()
@@ -164,12 +162,29 @@ if(USE_PCL)
     # When VTK kits are enabled we need to get imported targets
     vp_list_unique(PCL_VTK_LIBRARIES)
     if(NOT VTK_ENABLE_KITS)
-      set(PCL_VTK_LIBS ${PCL_VTK_LIBRARIES})
+      foreach(lib_ ${PCL_VTK_LIBRARIES})
+        get_target_property(imported_libs_ ${lib_} INTERFACE_LINK_LIBRARIES)
+        if(imported_libs_)
+          list(APPEND PCL_VTK_LIBS ${lib_})
+          list(APPEND PCL_VTK_IMPORTED_LIBS ${imported_libs_})
+        else()
+          list(APPEND PCL_VTK_LIBS ${lib_})
+        endif()
+      endforeach()
+      vp_list_unique(PCL_VTK_IMPORTED_LIBS)
+
+      # Filter "\$<LINK_ONLY:vtkCommonMath>;\$<LINK_ONLY:opengl32>;\$<LINK_ONLY:glu32>" into "vtkCommonMath;opengl32;glu32"
+      foreach(lib_ ${PCL_VTK_IMPORTED_LIBS})
+        string(REGEX REPLACE "\\$<LINK_ONLY:" "" lib_ ${lib_})
+        string(REGEX REPLACE ">" "" lib_ ${lib_})
+        list(APPEND PCL_VTK_LIBS ${lib_})
+      endforeach()
+      vp_list_unique(PCL_VTK_LIBS)
     else()
       foreach(lib_ ${PCL_VTK_LIBRARIES})
         get_target_property(imported_libs_ ${lib_} INTERFACE_LINK_LIBRARIES)
         if(imported_libs_)
-          list(APPEND PCL_VTK_IMPORTED_LIBS ${imported_libs_} ${prop})
+          list(APPEND PCL_VTK_IMPORTED_LIBS ${imported_libs_})
           if(${lib_}_KIT)
             list(APPEND PCL_VTK_LIBS ${${lib_}_KIT})
           endif()
@@ -180,7 +195,7 @@ if(USE_PCL)
       vp_list_unique(PCL_VTK_IMPORTED_LIBS)
       while(PCL_VTK_IMPORTED_LIBS)
         vp_list_pop_front(PCL_VTK_IMPORTED_LIBS elt)
-        if(elt MATCHES "^vtk") # to avoid precessing -framework ApplicationServices -framework CoreServices
+        if(elt MATCHES "^vtk" OR elt MATCHES "^pcl") # to avoid precessing -framework ApplicationServices -framework CoreServices
           get_target_property(imported_libs_ ${elt} INTERFACE_LINK_LIBRARIES)
           if(imported_libs_)
             list(APPEND PCL_VTK_IMPORTED_LIBS ${imported_libs_})
@@ -231,7 +246,12 @@ if(WITH_CLIPPER)
   include_directories(${CLIPPER_INCLUDE_DIRS})
 endif()
 
-vp_add_module(mbt visp_vision visp_core visp_me visp_visual_features OPTIONAL visp_ar visp_klt visp_gui PRIVATE_OPTIONAL ${CLIPPER_LIBRARIES})
+if(WITH_PUGIXML)
+  # pugixml is private
+  include_directories(${PUGIXML_INCLUDE_DIRS})
+endif()
+
+vp_add_module(mbt visp_vision visp_core visp_me visp_visual_features OPTIONAL visp_ar visp_klt visp_gui PRIVATE_OPTIONAL ${CLIPPER_LIBRARIES} ${PUGIXML_LIBRARIES})
 vp_glob_module_sources()
 
 if(USE_OGRE)
@@ -284,6 +304,7 @@ vp_create_module(${opt_libs})
 if(BUILD_TESTS)
   vp_set_source_file_compile_flag(test/testGenericTracker.cpp -Wno-unused-parameter -Wno-unused-but-set-parameter -Wno-overloaded-virtual)
   vp_set_source_file_compile_flag(test/testGenericTrackerDepth.cpp -Wno-unused-parameter -Wno-unused-but-set-parameter -Wno-overloaded-virtual)
+  vp_set_source_file_compile_flag(test/testMbtXmlGenericParser.cpp -Wno-unused-parameter -Wno-unused-but-set-parameter -Wno-overloaded-virtual)
 endif()
 
 # Improvement: remove hack to glob the test folder with vp_add_tests

@@ -136,8 +136,14 @@
 // Defined if April Tag is build and available.
 #cmakedefine VISP_HAVE_APRILTAG
 
+// Defined if big AprilTag family must be disabled.
+#cmakedefine VISP_DISABLE_APRILTAG_BIG_FAMILY
+
 // Defined if X11 library available.
 #cmakedefine VISP_HAVE_X11
+
+// Defined if pugixml is build and available.
+#cmakedefine VISP_HAVE_PUGIXML
 
 // Defined if XML2 library available.
 #cmakedefine VISP_HAVE_XML2

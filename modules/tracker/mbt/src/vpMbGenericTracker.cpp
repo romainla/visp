@@ -2678,15 +2678,10 @@ void vpMbGenericTracker::initFromPose(const std::map<std::string, const vpImage<
   From the configuration file initialize the parameters corresponding to the
   objects: tracking parameters, camera intrinsic parameters.
 
-  \warning To clean up memory allocated by the xml library, the user has to
-  call vpXmlParser::cleanup() before the exit().
-
   \throw vpException::ioError if the file has not been properly parsed (file
-  not found or wrong format for the data).
+  not found).
 
   \param configFile : full name of the xml file.
-
-  \sa vpXmlParser::cleanup()
 */
 void vpMbGenericTracker::loadConfigFile(const std::string &configFile)
 {
@@ -2711,13 +2706,11 @@ void vpMbGenericTracker::loadConfigFile(const std::string &configFile)
   From the configuration file initialize the parameters corresponding to the
   objects: tracking parameters, camera intrinsic parameters.
 
-  \warning To clean up memory allocated by the xml library, the user has to
-  call vpXmlParser::cleanup() before the exit().
+  \throw vpException::ioError if the file has not been properly parsed (file
+  not found).
 
   \param configFile1 : Full name of the xml file for the first camera.
   \param configFile2 : Full name of the xml file for the second camera.
-
-  \sa vpXmlParser::cleanup()
 
   \note This function assumes a stereo configuration of the generic tracker.
 */
@@ -2750,12 +2743,10 @@ void vpMbGenericTracker::loadConfigFile(const std::string &configFile1, const st
   From the configuration file initialize the parameters corresponding to the
   objects: tracking parameters, camera intrinsic parameters.
 
-  \warning To clean up memory allocated by the xml library, the user has to
-  call vpXmlParser::cleanup() before the exit().
+  \throw vpException::ioError if the file has not been properly parsed (file
+  not found).
 
   \param mapOfConfigFiles : Map of xml files.
-
-  \sa loadConfigFile(const std::string &), vpXmlParser::cleanup()
 
   \note Configuration files must be supplied for all the cameras.
 */
@@ -5103,7 +5094,7 @@ void vpMbGenericTracker::track(std::map<std::string, const vpImage<unsigned char
     }
 
     if (tracker->m_trackerType & (DEPTH_NORMAL_TRACKER | DEPTH_DENSE_TRACKER) &&
-        mapOfPointClouds[it->first] == nullptr) {
+        ! mapOfPointClouds[it->first]) { // mapOfPointClouds[it->first] == nullptr
       throw vpException(vpException::fatalError, "Pointcloud smart pointer is NULL!");
     }
   }
@@ -5185,7 +5176,7 @@ void vpMbGenericTracker::track(std::map<std::string, const vpImage<vpRGBa> *> &m
     }
 
     if (tracker->m_trackerType & (DEPTH_NORMAL_TRACKER | DEPTH_DENSE_TRACKER) &&
-        mapOfPointClouds[it->first] == nullptr) {
+        ! mapOfPointClouds[it->first]) { // mapOfPointClouds[it->first] == nullptr
       throw vpException(vpException::fatalError, "Pointcloud smart pointer is NULL!");
     }
   }
@@ -6140,7 +6131,7 @@ void vpMbGenericTracker::TrackerWrapper::loadConfigFile(const std::string &confi
   // Load projection error config
   vpMbTracker::loadConfigFile(configFile);
 
-#ifdef VISP_HAVE_XML2
+#ifdef VISP_HAVE_PUGIXML
   vpMbtXmlGenericParser xmlp((vpMbtXmlGenericParser::vpParserType)m_trackerType);
 
   xmlp.setCameraParameters(cam);
@@ -6175,7 +6166,6 @@ void vpMbGenericTracker::TrackerWrapper::loadConfigFile(const std::string &confi
   xmlp.setDepthDenseSamplingStepY(m_depthDenseSamplingStepY);
 
   try {
-
     std::cout << " *********** Parsing XML for";
 
     std::vector<std::string> tracker_names;
@@ -6262,7 +6252,7 @@ void vpMbGenericTracker::TrackerWrapper::loadConfigFile(const std::string &confi
   // Depth dense
   setDepthDenseSamplingStep(xmlp.getDepthDenseSamplingStepX(), xmlp.getDepthDenseSamplingStepY());
 #else
-  std::cerr << "You need the libXML2 to read the config file: " << configFile << std::endl;
+  std::cerr << "pugixml third-party is not properly built to read config file: " << configFile << std::endl;
 #endif
 }
 
@@ -6725,7 +6715,7 @@ void vpMbGenericTracker::TrackerWrapper::testTracking()
 }
 
 void vpMbGenericTracker::TrackerWrapper::track(const vpImage<unsigned char> &
-#ifdef VISP_HAVE_PCL
+#if defined(VISP_HAVE_PCL) && defined(VISP_HAVE_CXX11)
                                                    I
 #endif
 )
@@ -6739,7 +6729,7 @@ void vpMbGenericTracker::TrackerWrapper::track(const vpImage<unsigned char> &
     return;
   }
 
-#ifdef VISP_HAVE_PCL
+#if defined(VISP_HAVE_PCL) && defined(VISP_HAVE_CXX11)
   track(&I, nullptr);
 #endif
 }
@@ -6771,7 +6761,7 @@ void vpMbGenericTracker::TrackerWrapper::track(const vpImage<unsigned char> *con
     throw vpException(vpException::fatalError, "Image pointer is NULL!");
   }
 
-  if (m_trackerType & (DEPTH_NORMAL_TRACKER | DEPTH_DENSE_TRACKER) && point_cloud == nullptr) {
+  if (m_trackerType & (DEPTH_NORMAL_TRACKER | DEPTH_DENSE_TRACKER) && ! point_cloud) { // point_cloud == nullptr
     throw vpException(vpException::fatalError, "Pointcloud smart pointer is NULL!");
   }
 

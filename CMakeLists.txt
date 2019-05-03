@@ -78,7 +78,7 @@ endif()
 
 # By default set release configuration
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE String "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif()
 
 project(VISP C CXX)
@@ -104,6 +104,9 @@ if(POLICY CMP0054)
 endif()
 if(POLICY CMP0072)
   cmake_policy(SET CMP0072 NEW) # To use legacy GL library with FindOpenGL and cmake 3.12.0
+endif()
+if(POLICY CMP0074)
+  cmake_policy(SET CMP0074 NEW) # For PCL_ROOT usage and cmake 3.12.0 when PCL 1.9.1 all in one is used on Windows
 endif()
 if(POLICY CMP0075)
   cmake_policy(SET CMP0075 NEW) # For check_include_file and cmake 3.12.0
@@ -608,6 +611,7 @@ VP_OPTION(WITH_APRILTAG   ""           ""    "Build AprilTag as built-in library
 VP_OPTION(WITH_ATIDAQ     ""           ""    "Build atidaq-c as built-in library"  "" ON IF USE_COMEDI AND NOT WINRT)
 VP_OPTION(WITH_CLIPPER    ""           ""    "Build clipper as built-in library"   "" ON IF USE_OPENCV)
 VP_OPTION(WITH_LAPACK     ""           ""    "Build lapack as built-in library"    "" ON IF NOT USE_BLAS/LAPACK)
+VP_OPTION(WITH_PUGIXML    ""           ""    "Build pugixml as built-in library"   "" ON)
 VP_OPTION(WITH_QBDEVICE   ""           ""    "Build qbdevice-api as built-in library" "" ON IF USE_CXX11 AND (NOT WINRT) AND (NOT IOS))
 
 # Find IsNaN (should be after USE_CXX11)
@@ -732,6 +736,7 @@ endif()
 # definition
 if(WIN32 AND MSVC)
   add_definitions("-D_CRT_SECURE_NO_DEPRECATE")
+  add_definitions("-D_SCL_SECURE_NO_WARNINGS") # to avoid warning C4996; std::copy::_Unchecked_iterators::_Deprecate
 endif()
 
 #----------------------------------------------------------------------
@@ -874,6 +879,8 @@ VP_SET(VISP_HAVE_COMEDI      TRUE IF (BUILD_MODULE_visp_sensor AND USE_COMEDI))
 VP_SET(VISP_HAVE_ATIDAQ      TRUE IF (BUILD_MODULE_visp_sensor AND WITH_ATIDAQ))
 VP_SET(VISP_HAVE_CLIPPER     TRUE IF (BUILD_MODULE_visp_mbt AND BUILD_MODULE_visp_klt AND WITH_CLIPPER))
 VP_SET(VISP_HAVE_APRILTAG    TRUE IF (BUILD_MODULE_visp_detection AND WITH_APRILTAG))
+VP_SET(VISP_HAVE_PUGIXML     TRUE IF (BUILD_MODULE_visp_core AND WITH_PUGIXML))
+VP_SET(VISP_DISABLE_APRILTAG_BIG_FAMILY TRUE IF (CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo" AND CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.5))
 VP_SET(VISP_HAVE_QBDEVICE    TRUE IF (BUILD_MODULE_visp_robot AND WITH_QBDEVICE))
 
 VP_SET(VISP_BUILD_SHARED_LIBS TRUE IF BUILD_SHARED_LIBS) # for header vpConfig.h
@@ -1431,13 +1438,15 @@ status("    Use atidaq (built-in):"  WITH_ATIDAQ      THEN "yes (ver ${ATIDAQ_VE
 status("    Use comedi:"             USE_COMEDI       THEN "yes (ver ${COMEDI_VERSION})" ELSE "no")
 status("")
 status("  Detection: ")
-status("    Use zbar:"                USE_ZBAR         THEN "yes (ver ${ZBAR_VERSION})" ELSE "no")
-status("    Use dmtx:"                USE_DMTX         THEN "yes (ver ${DMTX_VERSION})" ELSE "no")
-status("    Use AprilTag (built-in):" WITH_APRILTAG    THEN "yes (ver ${APRILTAG_VERSION})" ELSE "no")
+status("    Use zbar:"                      USE_ZBAR                            THEN "yes (ver ${ZBAR_VERSION})" ELSE "no")
+status("    Use dmtx:"                      USE_DMTX                            THEN "yes (ver ${DMTX_VERSION})" ELSE "no")
+status("    Use AprilTag (built-in):"       WITH_APRILTAG                       THEN "yes (ver ${APRILTAG_VERSION})" ELSE "no")
+status("    Disable AprilTag big family:"   VISP_DISABLE_APRILTAG_BIG_FAMILY    THEN "yes" ELSE "no")
 status("")
 status("  Misc: ")
 status("    Use Clipper (built-in):"  WITH_CLIPPER     THEN "yes (ver ${CLIPPER_VERSION})" ELSE "no")
-status("    Use XML2:"                USE_XML2         THEN "yes (ver ${XML2_VERSION_STRING})" ELSE "no")
+status("    Use pugixml (built-in):"  WITH_PUGIXML     THEN "yes (ver ${PUGIXML_VERSION})" ELSE "no")
+status("    Use libxml2:"             USE_XML2         THEN "yes (ver ${XML2_VERSION_STRING})" ELSE "no")
 status("")
 status("  Optimization: ")
 status("    Use OpenMP:"             USE_OPENMP         THEN "yes" ELSE "no")
