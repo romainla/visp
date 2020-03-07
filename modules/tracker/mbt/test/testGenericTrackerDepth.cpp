@@ -45,7 +45,7 @@
 
 #if defined(VISP_HAVE_MODULE_MBT)
 
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
 #include <type_traits>
 #endif
 
@@ -161,11 +161,11 @@ namespace
   }
 
   template <typename Type>
-  bool read_data(const std::string &input_directory, const int cpt, const vpCameraParameters &cam_depth,
+  bool read_data(const std::string &input_directory, int cpt, const vpCameraParameters &cam_depth,
                  vpImage<Type> &I, vpImage<uint16_t> &I_depth,
                  std::vector<vpColVector> &pointcloud, vpHomogeneousMatrix &cMo)
   {
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
     static_assert(std::is_same<Type, unsigned char>::value || std::is_same<Type, vpRGBa>::value,
                   "Template function supports only unsigned char and vpRGBa images!");
 #endif
@@ -226,7 +226,7 @@ namespace
   template <typename Type>
   bool run(vpImage<Type> &I, const std::string &input_directory, bool opt_click_allowed,
            bool opt_display, bool useScanline, int opt_lastFrame, bool use_mask) {
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
     static_assert(std::is_same<Type, unsigned char>::value || std::is_same<Type, vpRGBa>::value,
                   "Template function supports only unsigned char and vpRGBa images!");
 #endif

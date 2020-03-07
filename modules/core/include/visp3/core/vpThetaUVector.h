@@ -118,7 +118,7 @@ class vpQuaternionVector;
   \endcode
   Or you can also initialize the vector from a list of doubles if ViSP is build with c++11 enabled:
   \code
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
   tu = {M_PI_4, M_PI_2, M_PI};
 #endif
   \endcode
@@ -194,7 +194,7 @@ public:
   explicit vpThetaUVector(const vpColVector &tu);
   explicit vpThetaUVector(const std::vector<double> &tu);
 
-  vpThetaUVector(const double tux, const double tuy, const double tuz);
+  vpThetaUVector(double tux, double tuy, double tuz);
   //! Destructor.
   virtual ~vpThetaUVector(){};
 
@@ -214,7 +214,7 @@ public:
   vpThetaUVector buildFrom(const vpColVector &tu);
   vpThetaUVector buildFrom(const std::vector<double> &tu);
 
-  void buildFrom(const double tux, const double tuy, const double tuz);
+  void buildFrom(double tux, double tuy, double tuz);
 
   // extract the angle and the axis from the ThetaU representation
   void extract(double &theta, vpColVector &u) const;
@@ -224,7 +224,7 @@ public:
   vpThetaUVector &operator=(const vpColVector &tu);
   vpThetaUVector &operator=(double x);
 
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
   vpThetaUVector &operator=(const std::initializer_list<double> &list);
 #endif
 };

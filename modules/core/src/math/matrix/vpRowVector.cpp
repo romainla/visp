@@ -124,7 +124,7 @@ vpRowVector &vpRowVector::operator=(double x)
   return *this;
 }
 
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
 vpRowVector &vpRowVector::operator=(vpRowVector &&other)
 {
   if (this != &other) {
@@ -173,6 +173,23 @@ vpRowVector &vpRowVector::operator=(const std::initializer_list<double> &list)
   return *this;
 }
 #endif
+
+bool vpRowVector::operator==(const vpRowVector &v) const {
+  if (colNum != v.colNum ||
+      rowNum != v.rowNum /* should not happen */)
+    return false;
+
+  for (unsigned int i = 0; i < colNum; i++) {
+    if (!vpMath::equal(data[i], v.data[i], std::numeric_limits<double>::epsilon()))
+      return false;
+  }
+
+  return true;
+}
+
+bool vpRowVector::operator!=(const vpRowVector &v) const {
+  return !(*this == v);
+}
 
 /*!
 
@@ -566,7 +583,7 @@ vpRowVector::vpRowVector(const vpRowVector &v, unsigned int c, unsigned int ncol
   init(v, c, ncols);
 }
 
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
 vpRowVector::vpRowVector(vpRowVector &&v) : vpArray2D<double>()
 {
   rowNum = v.rowNum;
@@ -703,7 +720,7 @@ void vpRowVector::reshape(vpMatrix &M, const unsigned int &nrows, const unsigned
 
   The following example shows how to use this function:
   \code
-#include <visp/vpRowVector.h>
+#include <visp3/core/vpRowVector.h>
 
 int main()
 {
@@ -905,7 +922,7 @@ double vpRowVector::median(const vpRowVector &v)
 /*!
   Compute the standard deviation value of all the elements of the vector.
 */
-double vpRowVector::stdev(const vpRowVector &v, const bool useBesselCorrection)
+double vpRowVector::stdev(const vpRowVector &v, bool useBesselCorrection)
 {
   if (v.data == NULL || v.size() == 0) {
     throw(vpException(vpException::dimensionError, "Cannot compute mean value of an empty row vector"));

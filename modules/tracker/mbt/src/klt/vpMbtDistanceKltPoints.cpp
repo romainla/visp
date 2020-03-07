@@ -233,7 +233,7 @@ void vpMbtDistanceKltPoints::computeInteractionMatrixAndResidu(vpColVector &_R, 
   }
 }
 
-double vpMbtDistanceKltPoints::compute_1_over_Z(const double x, const double y)
+double vpMbtDistanceKltPoints::compute_1_over_Z(double x, double y)
 {
   double num = cRc0_0n[0] * x + cRc0_0n[1] * y + cRc0_0n[2];
   double den = -(d0 - dt);
@@ -252,7 +252,7 @@ double vpMbtDistanceKltPoints::compute_1_over_Z(const double x, const double y)
   \param y_out : the y coordinates of the output point
   \param _cHc0 : the homography used to transfer the point
 */
-inline void vpMbtDistanceKltPoints::computeP_mu_t(const double x_in, const double y_in, double &x_out, double &y_out,
+inline void vpMbtDistanceKltPoints::computeP_mu_t(double x_in, double y_in, double &x_out, double &y_out,
                                                   const vpMatrix &_cHc0)
 {
   double p_mu_t_2 = x_in * _cHc0[2][0] + y_in * _cHc0[2][1] + _cHc0[2][2];
@@ -268,17 +268,17 @@ inline void vpMbtDistanceKltPoints::computeP_mu_t(const double x_in, const doubl
 }
 
 /*!
-  compute the homography using a displacement matrix.
+  Compute the homography using a displacement matrix.
 
   the homography is given by:
 
   \f$ {}^cH_{c_0} = {}^cR_{c_0} + \frac{{}^cT_{c_0} . {}^tN}{d_0} \f$
 
-  Several internal variables are computed (dt, cRc0_0n)
+  Several internal variables are computed (dt, cRc0_0n).
 
-  \param _cTc0 : the displacement matrix of the camera between the initial
-  position of the camera and the current camera position \param _cHc0 : the
-  homography of the plane
+  \param _cTc0 : The displacement matrix of the camera between the initial
+  position of the camera and the current camera position
+  \param _cHc0 : The homography of the plane.
 */
 void vpMbtDistanceKltPoints::computeHomography(const vpHomogeneousMatrix &_cTc0, vpHomography &_cHc0)
 {
@@ -325,7 +325,7 @@ void vpMbtDistanceKltPoints::computeHomography(const vpHomogeneousMatrix &_cTc0,
   \param _id : the id of the current feature to test
   \return true if the id is in the list of tracked feature
 */
-bool vpMbtDistanceKltPoints::isTrackedFeature(const int _id)
+bool vpMbtDistanceKltPoints::isTrackedFeature(int _id)
 {
   //   std::map<int, vpImagePoint>::const_iterator iter = initPoints.begin();
   //   while(iter != initPoints.end()){
@@ -586,8 +586,8 @@ void vpMbtDistanceKltPoints::displayPrimitive(const vpImage<vpRGBa> &_I)
 }
 
 void vpMbtDistanceKltPoints::display(const vpImage<unsigned char> &I, const vpHomogeneousMatrix & /*cMo*/,
-                                     const vpCameraParameters &camera, const vpColor &col, const unsigned int thickness,
-                                     const bool displayFullModel)
+                                     const vpCameraParameters &camera, const vpColor &col, unsigned int thickness,
+                                     bool displayFullModel)
 {
   std::vector<std::vector<double> > models = getModelForDisplay(camera, displayFullModel);
 
@@ -600,8 +600,8 @@ void vpMbtDistanceKltPoints::display(const vpImage<unsigned char> &I, const vpHo
 }
 
 void vpMbtDistanceKltPoints::display(const vpImage<vpRGBa> &I, const vpHomogeneousMatrix & /*cMo*/,
-                                     const vpCameraParameters &camera, const vpColor &col, const unsigned int thickness,
-                                     const bool displayFullModel)
+                                     const vpCameraParameters &camera, const vpColor &col, unsigned int thickness,
+                                     bool displayFullModel)
 {
   std::vector<std::vector<double> > models = getModelForDisplay(camera, displayFullModel);
 
@@ -633,7 +633,7 @@ std::vector<std::vector<double> > vpMbtDistanceKltPoints::getFeaturesForDisplay(
     iP2.set_i(vpMath::round(iP.get_i() + 7));
     iP2.set_j(vpMath::round(iP.get_j() + 7));
 
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
     std::vector<double> params = {1, //KLT
                                   iP.get_i(),
                                   iP.get_j(),
@@ -664,7 +664,7 @@ std::vector<std::vector<double> > vpMbtDistanceKltPoints::getFeaturesForDisplay(
   \param displayFullModel : If true, the line is displayed even if it is not
 */
 std::vector<std::vector<double> > vpMbtDistanceKltPoints::getModelForDisplay(const vpCameraParameters &camera,
-                                                                             const bool displayFullModel)
+                                                                             bool displayFullModel)
 {
   std::vector<std::vector<double> > models;
 
@@ -694,13 +694,13 @@ std::vector<std::vector<double> > vpMbtDistanceKltPoints::getModelForDisplay(con
           vpMeterPixelConversion::convertPoint(camera, linesLst[i].first.get_x(), linesLst[i].first.get_y(), ip1);
           vpMeterPixelConversion::convertPoint(camera, linesLst[i].second.get_x(), linesLst[i].second.get_y(), ip2);
 
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
           std::vector<double> params = {0, //0 for line parameters
                                         ip1.get_i(),
                                         ip1.get_j(),
                                         ip2.get_i(),
                                         ip2.get_j()};
-#else    
+#else
           std::vector<double> params;
           params.push_back(0); //0 for line parameters
           params.push_back(ip1.get_i());

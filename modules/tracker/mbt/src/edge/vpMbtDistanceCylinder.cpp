@@ -116,7 +116,7 @@ void vpMbtDistanceCylinder::project(const vpHomogeneousMatrix &cMo)
   \param _p2 : The second extremity on the axis.
   \param r : Radius of the cylinder.
 */
-void vpMbtDistanceCylinder::buildFrom(const vpPoint &_p1, const vpPoint &_p2, const double r)
+void vpMbtDistanceCylinder::buildFrom(const vpPoint &_p1, const vpPoint &_p2, double r)
 {
   c = new vpCylinder;
   p1 = new vpPoint;
@@ -181,7 +181,7 @@ void vpMbtDistanceCylinder::setMovingEdge(vpMe *_me)
   \param mask: Mask image or NULL if not wanted. Mask values that are set to true are considered in the tracking. To disable a pixel, set false.
   \return false if an error occur, true otherwise.
 */
-bool vpMbtDistanceCylinder::initMovingEdge(const vpImage<unsigned char> &I, const vpHomogeneousMatrix &cMo, const bool doNotTrack,
+bool vpMbtDistanceCylinder::initMovingEdge(const vpImage<unsigned char> &I, const vpHomogeneousMatrix &cMo, bool doNotTrack,
                                            const vpImage<bool> *mask)
 {
   if (isvisible) {
@@ -514,8 +514,8 @@ void vpMbtDistanceCylinder::reinitMovingEdge(const vpImage<unsigned char> &I, co
   \param displayFullModel : When true, display the circle even if non visible.
 */
 void vpMbtDistanceCylinder::display(const vpImage<unsigned char> &I, const vpHomogeneousMatrix &cMo,
-                                    const vpCameraParameters &camera, const vpColor &col, const unsigned int thickness,
-                                    const bool displayFullModel)
+                                    const vpCameraParameters &camera, const vpColor &col, unsigned int thickness,
+                                    bool displayFullModel)
 {
   std::vector<std::vector<double> > models = getModelForDisplay(I.getWidth(), I.getHeight(),
                                                                 cMo, camera, displayFullModel);
@@ -539,8 +539,8 @@ void vpMbtDistanceCylinder::display(const vpImage<unsigned char> &I, const vpHom
   \param displayFullModel : When true, display the circle even if non visible.
 */
 void vpMbtDistanceCylinder::display(const vpImage<vpRGBa> &I, const vpHomogeneousMatrix &cMo,
-                                    const vpCameraParameters &camera, const vpColor &col, const unsigned int thickness,
-                                    const bool displayFullModel)
+                                    const vpCameraParameters &camera, const vpColor &col, unsigned int thickness,
+                                    bool displayFullModel)
 {
   std::vector<std::vector<double> > models = getModelForDisplay(I.getWidth(), I.getHeight(),
                                                                 cMo, camera, displayFullModel);
@@ -564,7 +564,7 @@ std::vector<std::vector<double> > vpMbtDistanceCylinder::getFeaturesForDisplay()
   if (meline1 != NULL) {
     for (std::list<vpMeSite>::const_iterator it = meline1->getMeList().begin(); it != meline1->getMeList().end(); ++it) {
       vpMeSite p_me = *it;
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
       std::vector<double> params = {0, //ME
                                     p_me.get_ifloat(),
                                     p_me.get_jfloat(),
@@ -583,7 +583,7 @@ std::vector<std::vector<double> > vpMbtDistanceCylinder::getFeaturesForDisplay()
   if (meline2 != NULL) {
     for (std::list<vpMeSite>::const_iterator it = meline2->getMeList().begin(); it != meline2->getMeList().end(); ++it) {
       vpMeSite p_me = *it;
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
       std::vector<double> params = {0, //ME
                                     p_me.get_ifloat(),
                                     p_me.get_jfloat(),
@@ -615,7 +615,7 @@ std::vector<std::vector<double> > vpMbtDistanceCylinder::getFeaturesForDisplay()
 std::vector<std::vector<double> > vpMbtDistanceCylinder::getModelForDisplay(unsigned int, unsigned int,
                                                                             const vpHomogeneousMatrix &cMo,
                                                                             const vpCameraParameters &camera,
-                                                                            const bool displayFullModel)
+                                                                            bool displayFullModel)
 {
   std::vector<std::vector<double> > models;
 
@@ -664,7 +664,7 @@ std::vector<std::vector<double> > vpMbtDistanceCylinder::getModelForDisplay(unsi
     ip21.set_ij(i21, j21);
     ip22.set_ij(i22, j22);
 
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
     std::vector<double> params1 = {0,
                                    ip11.get_i(),
                                    ip11.get_j(),

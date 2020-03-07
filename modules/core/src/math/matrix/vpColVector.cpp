@@ -323,7 +323,7 @@ vpColVector::vpColVector(const std::vector<float> &v) : vpArray2D<double>((unsig
     (*this)[i] = (double)(v[i]);
 }
 
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
 /*!
   Move constructor that take rvalue.
  */
@@ -702,7 +702,7 @@ std::vector<double> vpColVector::toStdVector()
   return v;
 }
 
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
 /*!
   Overloaded move assignment operator taking rvalue.
  */
@@ -1134,7 +1134,7 @@ double vpColVector::median(const vpColVector &v)
 /*!
   Compute the standard deviation value of all the elements of the vector.
 */
-double vpColVector::stdev(const vpColVector &v, const bool useBesselCorrection)
+double vpColVector::stdev(const vpColVector &v, bool useBesselCorrection)
 {
   if (v.data == NULL || v.size() == 0) {
     throw(vpException(vpException::dimensionError, "Cannot compute column vector stdev: vector empty"));
@@ -1831,7 +1831,7 @@ std::ostream &vpColVector::matlabPrint(std::ostream &os) const
   \param c : Not used.
 
  */
-void vpColVector::insert(const vpColVector &v, const unsigned int r, const unsigned int c)
+void vpColVector::insert(const vpColVector &v, unsigned int r, unsigned int c)
 {
   (void)c;
   insert(r, v);

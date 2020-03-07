@@ -98,7 +98,7 @@ a:
 
 int main()
 {
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
   vpArray2D<float> a{ {-1, -2, -3}, {4, 5.5, 6.0f} };
   std::cout << "a:\n" << a << std::endl;
 #endif
@@ -108,7 +108,7 @@ int main()
   \code
 int main()
 {
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
   vpArray2D<float> a;
   a = { {-1, -2, -3}, {4, 5.5, 6.0f} };
 #endif
@@ -121,7 +121,7 @@ int main()
 
 int main()
 {
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
   vpArray2D<float> a{ -1, -2, -3, 4, 5.5, 6.0f };
   a.reshape(2, 3);
 #endif
@@ -155,14 +155,14 @@ public:
   Copy constructor of a 2D array.
   */
   vpArray2D<Type>(const vpArray2D<Type> &A) :
-  #ifdef VISP_HAVE_CXX11
+  #if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
     vpArray2D<Type>()
   #else
     rowNum(0), colNum(0), rowPtrs(NULL), dsize(0), data(NULL)
   #endif
   {
     resize(A.rowNum, A.colNum, false, false);
-    memcpy(data, A.data, rowNum * colNum * sizeof(Type));
+    memcpy(data, A.data, (size_t)rowNum * (size_t)colNum * sizeof(Type));
   }
 
   /*!
@@ -172,7 +172,7 @@ public:
   \param c : Array number of columns.
   */
   vpArray2D<Type>(unsigned int r, unsigned int c) :
-  #ifdef VISP_HAVE_CXX11
+  #if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
       vpArray2D<Type>()
   #else
       rowNum(0), colNum(0), rowPtrs(NULL), dsize(0), data(NULL)
@@ -189,7 +189,7 @@ public:
   \param val : Each element of the array is set to \e val.
   */
   vpArray2D<Type>(unsigned int r, unsigned int c, Type val) :
-  #ifdef VISP_HAVE_CXX11
+  #if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
       vpArray2D<Type>()
   #else
       rowNum(0), colNum(0), rowPtrs(NULL), dsize(0), data(NULL)
@@ -199,7 +199,7 @@ public:
     *this = val;
   }
 
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
   vpArray2D<Type>(vpArray2D<Type> &&A)
   {
     rowNum = A.rowNum;
@@ -302,8 +302,7 @@ public:
   \param recopy_ : if true, will perform an explicit recopy of the old data
   if needed and if flagNullify is set to false.
   */
-  void resize(const unsigned int nrows, const unsigned int ncols, const bool flagNullify = true,
-              const bool recopy_ = true)
+  void resize(unsigned int nrows, unsigned int ncols, bool flagNullify = true, bool recopy_ = true)
   {
     if ((nrows == rowNum) && (ncols == colNum)) {
       if (flagNullify && this->data != NULL) {
@@ -356,11 +355,11 @@ public:
 
       // Recopy of this->data array values or nullify
       if (flagNullify) {
-        memset(this->data, 0, this->dsize * sizeof(Type));
+        memset(this->data, 0, (size_t)(this->dsize) * sizeof(Type));
       } else if (recopyNeeded && this->rowPtrs != NULL) {
         // Recopy...
-        const unsigned int minRow = (this->rowNum < rowTmp) ? this->rowNum : rowTmp;
-        const unsigned int minCol = (this->colNum < colTmp) ? this->colNum : colTmp;
+        unsigned int minRow = (this->rowNum < rowTmp) ? this->rowNum : rowTmp;
+        unsigned int minCol = (this->colNum < colTmp) ? this->colNum : colTmp;
         for (unsigned int i = 0; i < this->rowNum; ++i) {
           for (unsigned int j = 0; j < this->colNum; ++j) {
             if ((minRow > i) && (minCol > j)) {
@@ -402,6 +401,15 @@ public:
     }
   }
 
+  /*!
+    Equal to comparison operator of a 2D array.
+  */
+  bool operator==(const vpArray2D<Type>& A) const;
+  /*!
+    Not equal to comparison operator of a 2D array.
+  */
+  bool operator!=(const vpArray2D<Type>& A) const;
+
   //! Set all the elements of the array to \e x.
   vpArray2D<Type> &operator=(Type x)
   {
@@ -416,12 +424,12 @@ public:
   {
     resize(A.rowNum, A.colNum, false, false);
     if (data != NULL && A.data != NULL && data != A.data) {
-      memcpy(data, A.data, rowNum * colNum * sizeof(Type));
+      memcpy(data, A.data, (size_t)rowNum * (size_t)colNum * sizeof(Type));
     }
     return *this;
   }
 
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
   vpArray2D<Type> &operator=(vpArray2D<Type> &&other)
   {
     if (this != &other) {
@@ -530,7 +538,7 @@ public:
 
     \sa save()
   */
-  static bool load(const std::string &filename, vpArray2D<Type> &A, const bool binary = false, char *header = NULL)
+  static bool load(const std::string &filename, vpArray2D<Type> &A, bool binary = false, char *header = NULL)
   {
     std::fstream file;
 
@@ -727,7 +735,7 @@ public:
 
     \sa load()
   */
-  static bool save(const std::string &filename, const vpArray2D<Type> &A, const bool binary = false,
+  static bool save(const std::string &filename, const vpArray2D<Type> &A, bool binary = false,
                    const char *header = "")
   {
     std::fstream file;
@@ -762,7 +770,7 @@ public:
       while (header[headerSize] != '\0') {
         headerSize++;
       }
-      file.write(header, headerSize + 1);
+      file.write(header, (size_t)headerSize + (size_t)1);
       unsigned int matrixSize;
       matrixSize = A.getRows();
       file.write((char *)&matrixSize, sizeof(unsigned int));
@@ -936,6 +944,56 @@ template <class Type> vpArray2D<Type> vpArray2D<Type>::hadamard(const vpArray2D<
   }
 
   return out;
+}
+
+template <class Type> bool vpArray2D<Type>::operator==(const vpArray2D<Type>& A) const
+{
+  if (A.rowNum != rowNum || A.colNum != colNum) {
+    return false;
+  }
+
+  for (unsigned int i = 0; i < A.size(); i++) {
+    if (data[i] != A.data[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+template <> inline bool vpArray2D<double>::operator==(const vpArray2D<double>& A) const
+{
+  if (A.rowNum != rowNum || A.colNum != colNum) {
+    return false;
+  }
+
+  for (unsigned int i = 0; i < A.size(); i++) {
+    if (fabs(data[i] - A.data[i]) > std::numeric_limits<double>::epsilon()) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+template <> inline bool vpArray2D<float>::operator==(const vpArray2D<float>& A) const
+{
+  if (A.rowNum != rowNum || A.colNum != colNum) {
+    return false;
+  }
+
+  for (unsigned int i = 0; i < A.size(); i++) {
+    if (fabsf(data[i] - A.data[i]) > std::numeric_limits<float>::epsilon()) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+template <class Type> bool vpArray2D<Type>::operator!=(const vpArray2D<Type>& A) const
+{
+  return !(*this == A);
 }
 
 #endif

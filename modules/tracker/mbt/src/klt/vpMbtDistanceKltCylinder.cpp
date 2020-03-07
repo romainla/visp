@@ -355,7 +355,7 @@ void vpMbtDistanceKltCylinder::computeInteractionMatrixAndResidu(const vpHomogen
   \param _id : the id of the current feature to test
   \return true if the id is in the list of tracked feature
 */
-bool vpMbtDistanceKltCylinder::isTrackedFeature(const int _id)
+bool vpMbtDistanceKltCylinder::isTrackedFeature(int _id)
 {
   std::map<int, vpImagePoint>::iterator iter = initPoints.find(_id);
   if (iter != initPoints.end())
@@ -574,7 +574,7 @@ void vpMbtDistanceKltCylinder::displayPrimitive(const vpImage<vpRGBa> &_I)
 
 void vpMbtDistanceKltCylinder::display(const vpImage<unsigned char> &I, const vpHomogeneousMatrix &cMo,
                                        const vpCameraParameters &camera, const vpColor &col,
-                                       const unsigned int thickness, const bool /*displayFullModel*/)
+                                       unsigned int thickness, const bool /*displayFullModel*/)
 {
   std::vector<std::vector<double> > models = getModelForDisplay(cMo, camera);
 
@@ -587,7 +587,7 @@ void vpMbtDistanceKltCylinder::display(const vpImage<unsigned char> &I, const vp
 
 void vpMbtDistanceKltCylinder::display(const vpImage<vpRGBa> &I, const vpHomogeneousMatrix &cMo,
                                        const vpCameraParameters &camera, const vpColor &col,
-                                       const unsigned int thickness, const bool /*displayFullModel*/)
+                                       unsigned int thickness, const bool /*displayFullModel*/)
 {
   std::vector<std::vector<double> > models = getModelForDisplay(cMo, camera);
 
@@ -619,7 +619,7 @@ std::vector<std::vector<double> > vpMbtDistanceKltCylinder::getFeaturesForDispla
     iP2.set_i(vpMath::round(iP.get_i() + 7));
     iP2.set_j(vpMath::round(iP.get_j() + 7));
 
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
     std::vector<double> params = {1, //KLT
                                   iP.get_i(),
                                   iP.get_j(),
@@ -697,7 +697,7 @@ std::vector<std::vector<double> > vpMbtDistanceKltCylinder::getModelForDisplay(c
     ip21.set_ij(i21, j21);
     ip22.set_ij(i22, j22);
 
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
     std::vector<double> params1 = {0, //line parameters
                                    ip11.get_i(),
                                    ip11.get_j(),

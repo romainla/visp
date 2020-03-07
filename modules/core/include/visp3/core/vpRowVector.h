@@ -95,7 +95,7 @@ v:
 
 int main()
 {
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
   vpRowVector v{-1, -2.1, -3};
   std::cout << "v:\n" << v << std::endl;
 #endif
@@ -105,7 +105,7 @@ int main()
   \code
 int main()
 {
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
   vpRowVector v;
   v = {-1, -2.1, -3};
 #endif
@@ -130,7 +130,7 @@ public:
   vpRowVector(const vpMatrix &M, unsigned int i);
   vpRowVector(const std::vector<double> &v);
   vpRowVector(const std::vector<float> &v);
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
   vpRowVector(vpRowVector &&v);
   vpRowVector(const std::initializer_list<double> &list) : vpArray2D<double>(list) { }
 #endif
@@ -220,18 +220,21 @@ public:
   vpRowVector &operator=(const vpMatrix &M);
   vpRowVector &operator=(const std::vector<double> &v);
   vpRowVector &operator=(const std::vector<float> &v);
-  vpRowVector &operator=(const double x);
-#ifdef VISP_HAVE_CXX11
+  vpRowVector &operator=(double x);
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
   vpRowVector &operator=(vpRowVector &&v);
   vpRowVector &operator=(const std::initializer_list<double> &list);
 #endif
+  //! Comparison operator.
+  bool operator==(const vpRowVector &v) const;
+  bool operator!=(const vpRowVector &v) const;
 
   double operator*(const vpColVector &x) const;
   vpRowVector operator*(const vpMatrix &M) const;
-  vpRowVector operator*(const double x) const;
+  vpRowVector operator*(double x) const;
   vpRowVector &operator*=(double x);
 
-  vpRowVector operator/(const double x) const;
+  vpRowVector operator/(double x) const;
   vpRowVector &operator/=(double x);
 
   vpRowVector operator+(const vpRowVector &v) const;
@@ -265,7 +268,7 @@ public:
     of columns.
     \param flagNullify : If true, set the data to zero.
    */
-  inline void resize(const unsigned int i, const bool flagNullify = true)
+  inline void resize(unsigned int i, bool flagNullify = true)
   {
     vpArray2D<double>::resize(1, i, flagNullify);
   }
@@ -280,7 +283,7 @@ public:
     \exception vpException::fatalError When \e nrows is not equal to 1.
 
     */
-  void resize(const unsigned int nrows, const unsigned int ncols, const bool flagNullify)
+  void resize(unsigned int nrows, unsigned int ncols, bool flagNullify)
   {
     if (nrows != 1)
       throw(vpException(vpException::fatalError,
@@ -304,7 +307,7 @@ public:
   static double median(const vpRowVector &v);
   static vpRowVector stack(const vpRowVector &A, const vpRowVector &B);
   static void stack(const vpRowVector &A, const vpRowVector &B, vpRowVector &C);
-  static double stdev(const vpRowVector &v, const bool useBesselCorrection = false);
+  static double stdev(const vpRowVector &v, bool useBesselCorrection = false);
 
 #if defined(VISP_BUILD_DEPRECATED_FUNCTIONS)
   /*!

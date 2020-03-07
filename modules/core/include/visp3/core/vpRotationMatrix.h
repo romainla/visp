@@ -112,7 +112,7 @@ int main()
 
 int main()
 {
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
   vpRotationMatrix R{ 0, 0, -1, 0, -1, 0, -1, 0, 0 };
   std::cout << "R:\n" << R << std::endl;
 #endif
@@ -132,9 +132,9 @@ public:
   explicit vpRotationMatrix(const vpRzyxVector &r);
   explicit vpRotationMatrix(const vpQuaternionVector &q);
   explicit vpRotationMatrix(const vpMatrix &R);
-  vpRotationMatrix(const double tux, const double tuy, const double tuz);
+  vpRotationMatrix(double tux, double tuy, double tuz);
 
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
   explicit vpRotationMatrix(const std::initializer_list<double> &list);
 #endif
 
@@ -150,11 +150,11 @@ public:
   vpRotationMatrix buildFrom(const vpRxyzVector &v);
   vpRotationMatrix buildFrom(const vpRzyxVector &v);
   vpRotationMatrix buildFrom(const vpQuaternionVector &q);
-  vpRotationMatrix buildFrom(const double tux, const double tuy, const double tuz);
+  vpRotationMatrix buildFrom(double tux, double tuy, double tuz);
 
   void eye();
 
-  vpColVector getCol(const unsigned int j) const;
+  vpColVector getCol(unsigned int j) const;
   vpThetaUVector getThetaUVector();
 
   vpRotationMatrix inverse() const;
@@ -166,7 +166,7 @@ public:
   vpRotationMatrix &operator=(const vpRotationMatrix &R);
   // copy operator from vpMatrix (handle with care)
   vpRotationMatrix &operator=(const vpMatrix &M);
-#ifdef VISP_HAVE_CXX11
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
   vpRotationMatrix& operator=(const std::initializer_list<double> &list);
 #endif
   // operation c = A * b (A is unchanged)
@@ -177,8 +177,8 @@ public:
   vpMatrix operator*(const vpMatrix &M) const;
   // operation v2 = A * v1 (A is unchanged)
   vpColVector operator*(const vpColVector &v) const;
-  vpRotationMatrix operator*(const double x) const;
-  vpRotationMatrix &operator*=(const double x);
+  vpRotationMatrix operator*(double x) const;
+  vpRotationMatrix &operator*=(double x);
 
   vpRotationMatrix& operator<<(double val);
   vpRotationMatrix& operator,(double val);
@@ -191,7 +191,7 @@ public:
     3-by-3 matrix.
     \exception vpException::fatalError When this function is called.
     */
-  void resize(const unsigned int nrows, const unsigned int ncols, const bool flagNullify = true)
+  void resize(unsigned int nrows, unsigned int ncols, bool flagNullify = true)
   {
     (void)nrows;
     (void)ncols;

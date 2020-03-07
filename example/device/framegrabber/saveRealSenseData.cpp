@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <visp3/core/vpConfig.h>
-#if (defined (VISP_HAVE_REALSENSE) || defined (VISP_HAVE_REALSENSE2)) && defined (VISP_HAVE_CPP11_COMPATIBILITY) && (defined (VISP_HAVE_X11) || defined (VISP_HAVE_GDI))
+#if (defined (VISP_HAVE_REALSENSE) || defined (VISP_HAVE_REALSENSE2)) && (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11) && (defined (VISP_HAVE_X11) || defined (VISP_HAVE_GDI))
 
 #include <fstream>
 #include <queue>
@@ -233,9 +233,9 @@ private:
 
 class StorageWorker {
 public:
-  StorageWorker(FrameQueue &queue, const std::string &directory, const bool save_color,
-                const bool save_depth, const bool save_pointcloud, const bool save_infrared,
-                const bool save_pointcloud_binary_format, int
+  StorageWorker(FrameQueue &queue, const std::string &directory, bool save_color,
+                bool save_depth, bool save_pointcloud, bool save_infrared,
+                bool save_pointcloud_binary_format, int
 #ifndef VISP_HAVE_PCL
                 width
 #endif
